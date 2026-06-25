@@ -863,18 +863,6 @@ function library:AddWindow(title, options)
             TitleLabel.TextSize = options.title_size
         end
     end
-    if options.background_image then
-        local bg = Instance.new("ImageLabel")
-        bg.Name = "BackgroundImage"
-        bg.BackgroundTransparency = 1
-        bg.Position = UDim2.new(0, -30, 0, 60)
-        bg.Size = UDim2.new(1, 15, 1, -60)
-        bg.Image = "rbxassetid://" .. tostring(options.background_image)
-        bg.ImageTransparency = 0.55
-        bg.ScaleType = Enum.ScaleType.Crop
-        bg.ZIndex = 1
-        bg.Parent = Window
-    end
     Window.Size = UDim2.new(0, options.min_size.X, 0, options.min_size.Y)
     Window.ZIndex = Window.ZIndex + (windows * 10)
     do
@@ -1020,6 +1008,18 @@ end
             local new_tab = Prefabs:FindFirstChild("Tab"):Clone()
             new_tab.Parent = tabs
             new_tab.ZIndex = new_tab.ZIndex + (windows * 10)
+            if options.background_image then
+                local tabBg = Instance.new("ImageLabel")
+                tabBg.Name = "BackgroundImage"
+                tabBg.BackgroundTransparency = 1
+                tabBg.Position = UDim2.new(0, 0, 0, 0)
+                tabBg.Size = UDim2.new(1, 0, 1, 0)
+                tabBg.Image = "rbxassetid://" .. tostring(options.background_image)
+                tabBg.ImageTransparency = 0.55
+                tabBg.ScaleType = Enum.ScaleType.Crop
+                tabBg.ZIndex = 1
+                tabBg.Parent = new_tab
+            end
             local function show()
                 if dropdown_open then return end
                 for i, v in next, tab_buttons:GetChildren() do
