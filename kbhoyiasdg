@@ -837,6 +837,12 @@ function library:AddWindow(title, options)
     options.tween_time = 0.1
     local Window = Prefabs:FindFirstChild("Window"):Clone()
     Window.Parent = Windows
+    if options.background_image then
+        Window.Image = "rbxassetid://" .. tostring(options.background_image)
+        Window.ImageColor3 = Color3.new(1, 1, 1)
+        Window.ImageTransparency = 0.5
+        Window.ScaleType = Enum.ScaleType.Crop
+    end
     local TitleLabel = Window:FindFirstChild("Title")
     if options.title_image then
         TitleLabel.Visible = false
@@ -1008,18 +1014,6 @@ end
             local new_tab = Prefabs:FindFirstChild("Tab"):Clone()
             new_tab.Parent = tabs
             new_tab.ZIndex = new_tab.ZIndex + (windows * 10)
-            if options.background_image then
-                local tabBg = Instance.new("ImageLabel")
-                tabBg.Name = "BackgroundImage"
-                tabBg.BackgroundTransparency = 1
-                tabBg.Position = UDim2.new(0, 0, 0, 0)
-                tabBg.Size = UDim2.new(1, 0, 1, 0)
-                tabBg.Image = "rbxassetid://" .. tostring(options.background_image)
-                tabBg.ImageTransparency = 0.55
-                tabBg.ScaleType = Enum.ScaleType.Crop
-                tabBg.ZIndex = 1
-                tabBg.Parent = new_tab
-            end
             local function show()
                 if dropdown_open then return end
                 for i, v in next, tab_buttons:GetChildren() do
