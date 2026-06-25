@@ -128,7 +128,7 @@ Bar.Parent = Window
 Bar.BackgroundColor3 = Color3.new(0.160784, 0.290196, 0.478431)
 Bar.BorderSizePixel = 0
 Bar.Position = UDim2.new(0, 0, 0, 5)
-Bar.Size = UDim2.new(1, 0, 0, 23)
+Bar.Size = UDim2.new(1, 0, 0, 15)
 Toggle.Name = "Toggle"
 Toggle.Parent = Bar
 Toggle.BackgroundColor3 = Color3.new(1, 1, 1)
@@ -162,8 +162,8 @@ Tabs.Name = "Tabs"
 Tabs.Parent = Window
 Tabs.BackgroundColor3 = Color3.new(1, 1, 1)
 Tabs.BackgroundTransparency = 1
-Tabs.Position = UDim2.new(0, 15, 0, 63)
-Tabs.Size = UDim2.new(1, -30, 1, -63)
+Tabs.Position = UDim2.new(0, 15, 0, 60)
+Tabs.Size = UDim2.new(1, -30, 1, -60)
 Title.Name = "Title"
 Title.Parent = Window
 Title.BackgroundColor3 = Color3.new(1, 1, 1)
@@ -179,7 +179,7 @@ TabSelection.Name = "TabSelection"
 TabSelection.Parent = Window
 TabSelection.BackgroundColor3 = Color3.new(1, 1, 1)
 TabSelection.BackgroundTransparency = 1
-TabSelection.Position = UDim2.new(0, 15, 0, 33)
+TabSelection.Position = UDim2.new(0, 15, 0, 30)
 TabSelection.Size = UDim2.new(1, -30, 0, 25)
 TabSelection.Visible = false
 TabSelection.Image = "rbxassetid://2851929490"
@@ -965,7 +965,7 @@ function library:AddWindow(title, options)
                     end
                     Resizer.Active = false
                     oldy = Window.AbsoluteSize.Y
-                    Resize(Window, {Size = UDim2.new(0, Window.AbsoluteSize.X, 0, 33)}, options.tween_time)
+                    Resize(Window, {Size = UDim2.new(0, Window.AbsoluteSize.X, 0, 26)}, options.tween_time)
                     open_close.Parent:FindFirstChild("Base").Transparency = 1
                 else
                     for i,v in next, oldwindowdata do
