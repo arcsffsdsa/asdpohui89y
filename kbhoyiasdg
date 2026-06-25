@@ -838,16 +838,30 @@ function library:AddWindow(title, options)
     local Window = Prefabs:FindFirstChild("Window"):Clone()
     Window.Parent = Windows
     local TitleLabel = Window:FindFirstChild("Title")
-    TitleLabel.Text = title
-    if options.title_font then
-        if typeof(options.title_font) == "EnumItem" then
-            TitleLabel.Font = options.title_font
-        else
-            TitleLabel.FontFace = options.title_font
+    if options.title_image then
+        TitleLabel.Visible = false
+        local imgTitle = Instance.new("ImageLabel")
+        imgTitle.Name = "TitleImageLabel"
+        imgTitle.BackgroundTransparency = 1
+        imgTitle.Position = UDim2.new(0, 5, 0, 1)
+        imgTitle.Size = UDim2.new(1, -10, 0, 22)
+        imgTitle.Image = "rbxassetid://" .. tostring(options.title_image)
+        imgTitle.ImageColor3 = Color3.new(1, 1, 1)
+        imgTitle.ScaleType = Enum.ScaleType.Fit
+        imgTitle.ZIndex = TitleLabel.ZIndex
+        imgTitle.Parent = Window
+    else
+        TitleLabel.Text = title
+        if options.title_font then
+            if typeof(options.title_font) == "EnumItem" then
+                TitleLabel.Font = options.title_font
+            else
+                TitleLabel.FontFace = options.title_font
+            end
         end
-    end
-    if options.title_size then
-        TitleLabel.TextSize = options.title_size
+        if options.title_size then
+            TitleLabel.TextSize = options.title_size
+        end
     end
     Window.Size = UDim2.new(0, options.min_size.X, 0, options.min_size.Y)
     Window.ZIndex = Window.ZIndex + (windows * 10)
