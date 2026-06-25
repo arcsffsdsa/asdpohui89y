@@ -843,11 +843,11 @@ function library:AddWindow(title, options)
         local imgTitle = Instance.new("ImageLabel")
         imgTitle.Name = "TitleImageLabel"
         imgTitle.BackgroundTransparency = 1
-        imgTitle.Position = UDim2.new(0, 5, 0, 1)
-        imgTitle.Size = UDim2.new(1, -10, 0, 22)
+        imgTitle.Position = UDim2.new(0, 30, 0, 2)
+        imgTitle.Size = UDim2.new(1, -60, 0, 22)
         imgTitle.Image = "rbxassetid://" .. tostring(options.title_image)
         imgTitle.ImageColor3 = Color3.new(1, 1, 1)
-        imgTitle.ScaleType = Enum.ScaleType.Fit
+        imgTitle.ScaleType = Enum.ScaleType.Stretch
         imgTitle.ZIndex = TitleLabel.ZIndex
         imgTitle.Parent = Window
     else
