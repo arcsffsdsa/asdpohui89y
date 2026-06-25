@@ -128,7 +128,7 @@ Bar.Parent = Window
 Bar.BackgroundColor3 = Color3.new(0.160784, 0.290196, 0.478431)
 Bar.BorderSizePixel = 0
 Bar.Position = UDim2.new(0, 0, 0, 5)
-Bar.Size = UDim2.new(1, 0, 0, 15)
+Bar.Size = UDim2.new(1, 0, 0, 23)
 Toggle.Name = "Toggle"
 Toggle.Parent = Bar
 Toggle.BackgroundColor3 = Color3.new(1, 1, 1)
@@ -843,8 +843,8 @@ function library:AddWindow(title, options)
         local imgTitle = Instance.new("ImageLabel")
         imgTitle.Name = "TitleImageLabel"
         imgTitle.BackgroundTransparency = 1
-        imgTitle.Position = UDim2.new(0, 0, 0, 2)
-        imgTitle.Size = UDim2.new(1, 0, 0, 22)
+        imgTitle.Position = UDim2.new(0, 0, 0, 3)
+        imgTitle.Size = UDim2.new(1, 0, 0, 30)
         imgTitle.Image = "rbxassetid://" .. tostring(options.title_image)
         imgTitle.ImageColor3 = Color3.new(1, 1, 1)
         imgTitle.ScaleType = Enum.ScaleType.Fit
@@ -965,7 +965,7 @@ function library:AddWindow(title, options)
                     end
                     Resizer.Active = false
                     oldy = Window.AbsoluteSize.Y
-                    Resize(Window, {Size = UDim2.new(0, Window.AbsoluteSize.X, 0, 26)}, options.tween_time)
+                    Resize(Window, {Size = UDim2.new(0, Window.AbsoluteSize.X, 0, 34)}, options.tween_time)
                     open_close.Parent:FindFirstChild("Base").Transparency = 1
                 else
                     for i,v in next, oldwindowdata do
