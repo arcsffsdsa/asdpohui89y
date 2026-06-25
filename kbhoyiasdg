@@ -134,10 +134,10 @@ Toggle.Parent = Bar
 Toggle.BackgroundColor3 = Color3.new(1, 1, 1)
 Toggle.BackgroundTransparency = 1
 Toggle.Position = UDim2.new(0, 5, 0, -2)
-Toggle.Rotation = 0
+Toggle.Rotation = 90
 Toggle.Size = UDim2.new(0, 20, 0, 20)
 Toggle.ZIndex = 2
-Toggle.Image = "rbxassetid://73042743489058"
+Toggle.Image = "rbxassetid://105820587321021"
 Base.Name = "Base"
 Base.Parent = Bar
 Base.BackgroundColor3 = Color3.new(0.160784, 0.290196, 0.478431)
@@ -863,6 +863,21 @@ function library:AddWindow(title, options)
             TitleLabel.TextSize = options.title_size
         end
     end
+    if options.background_image then
+        local TabsFrame = Window:FindFirstChild("Tabs")
+        if TabsFrame then
+            local bg = Instance.new("ImageLabel")
+            bg.Name = "BackgroundImage"
+            bg.BackgroundTransparency = 1
+            bg.Position = UDim2.new(0, 0, 0, 0)
+            bg.Size = UDim2.new(1, 0, 1, 0)
+            bg.Image = "rbxassetid://" .. tostring(options.background_image)
+            bg.ImageTransparency = 0.55
+            bg.ScaleType = Enum.ScaleType.Crop
+            bg.ZIndex = TabsFrame.ZIndex
+            bg.Parent = TabsFrame
+        end
+    end
     Window.Size = UDim2.new(0, options.min_size.X, 0, options.min_size.Y)
     Window.ZIndex = Window.ZIndex + (windows * 10)
     do
@@ -940,23 +955,9 @@ function library:AddWindow(title, options)
         local canopen = true
         local oldwindowdata = {}
         local oldy = Window.AbsoluteSize.Y
-        local iconNormalSize = UDim2.new(0, 20, 0, 20)
-        local iconExpandSize = UDim2.new(0, 30, 0, 30)
-        local function pulseIcon()
-            spawn(function()
-                local expandInfo = TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-                local shrinkInfo = TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
-                local expandTween = TweenService:Create(open_close, expandInfo, {Size = iconExpandSize})
-                expandTween:Play()
-                expandTween.Completed:Wait()
-                local shrinkTween = TweenService:Create(open_close, shrinkInfo, {Size = iconNormalSize})
-                shrinkTween:Play()
-            end)
-        end
         open_close.MouseButton1Click:Connect(function()
             if canopen then
                 canopen = false
-                pulseIcon()
                 if open then
                     oldwindowdata = {}
                     for i,v in next, Window:FindFirstChild("Tabs"):GetChildren() do
@@ -965,6 +966,7 @@ function library:AddWindow(title, options)
                     end
                     Resizer.Active = false
                     oldy = Window.AbsoluteSize.Y
+                    Resize(open_close, {Rotation = 0}, options.tween_time)
                     Resize(Window, {Size = UDim2.new(0, Window.AbsoluteSize.X, 0, 26)}, options.tween_time)
                     open_close.Parent:FindFirstChild("Base").Transparency = 1
                 else
@@ -972,6 +974,7 @@ function library:AddWindow(title, options)
                         i.Visible = v
                     end
                     Resizer.Active = true
+                    Resize(open_close, {Rotation = 90}, options.tween_time)
                     Resize(Window, {Size = UDim2.new(0, Window.AbsoluteSize.X, 0, oldy)}, options.tween_time)
                     open_close.Parent:FindFirstChild("Base").Transparency = 0
                 end
