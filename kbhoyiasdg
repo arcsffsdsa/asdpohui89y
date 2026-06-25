@@ -840,7 +840,7 @@ function library:AddWindow(title, options)
     if options.background_image then
         Window.Image = "rbxassetid://" .. tostring(options.background_image)
         Window.ImageColor3 = Color3.new(1, 1, 1)
-        Window.ImageTransparency = 0.5
+        Window.ImageTransparency = 1
         Window.ScaleType = Enum.ScaleType.Crop
     end
     local TitleLabel = Window:FindFirstChild("Title")
