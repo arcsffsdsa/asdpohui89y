@@ -837,7 +837,18 @@ function library:AddWindow(title, options)
     options.tween_time = 0.1
     local Window = Prefabs:FindFirstChild("Window"):Clone()
     Window.Parent = Windows
-    Window:FindFirstChild("Title").Text = title
+    local TitleLabel = Window:FindFirstChild("Title")
+    TitleLabel.Text = title
+    if options.title_font then
+        if typeof(options.title_font) == "EnumItem" then
+            TitleLabel.Font = options.title_font
+        else
+            TitleLabel.FontFace = options.title_font
+        end
+    end
+    if options.title_size then
+        TitleLabel.TextSize = options.title_size
+    end
     Window.Size = UDim2.new(0, options.min_size.X, 0, options.min_size.Y)
     Window.ZIndex = Window.ZIndex + (windows * 10)
     do
