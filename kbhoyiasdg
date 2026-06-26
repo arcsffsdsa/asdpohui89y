@@ -1071,11 +1071,6 @@ end
                         RS.Heartbeat:Wait()
                     end
                 end)
-                local btnStroke = Instance.new("UIStroke")
-                btnStroke.Color = Color3.new(0.784314, 0.784314, 0.784314)
-                btnStroke.Thickness = 0.5
-                btnStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-                btnStroke.Parent = button
                 button.MouseButton1Click:Connect(function()
                     ripple(button, mouse.X, mouse.Y)
                     pcall(callback)
