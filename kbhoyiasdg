@@ -813,6 +813,7 @@ local function ripple(button, x, y)
         Resize(circle, {ImageTransparency = 1}, 0.5)
         wait(0.5)
         circle:Destroy()
+        button.ClipsDescendants = false
     end)
 end
 local windows = 0
