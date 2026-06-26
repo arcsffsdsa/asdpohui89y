@@ -1073,9 +1073,9 @@ end
                 end)
                 local btnStroke = Instance.new("UIStroke")
                 btnStroke.Color = Color3.new(0.784314, 0.784314, 0.784314)
-                btnStroke.Thickness = 0.2
+                btnStroke.Thickness = 0.5
                 btnStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-                btnStroke.Parent = button
+                btnStroke.Parent = button:GetChildren()[1]
                 button.MouseButton1Click:Connect(function()
                     ripple(button, mouse.X, mouse.Y)
                     pcall(callback)
