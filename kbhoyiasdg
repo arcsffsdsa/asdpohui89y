@@ -1148,33 +1148,32 @@ end
                 indicator.ZIndex = indicator.ZIndex + (windows * 10)
                 value.ZIndex = value.ZIndex + (windows * 10)
                 title.Text = slider_text
-                local Entered = false
-                slider.MouseEnter:Connect(function()
-                    Entered = true
-                    Window.Draggable = false
-                end)
-                slider.MouseLeave:Connect(function()
-                    Entered = false
-                    Window.Draggable = true
-                end)
                 local Held = false
                 UIS.InputBegan:Connect(function(inputObject)
                     if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
+                        if slider_options.readonly then return end
+                        local ml = gMouse()
+                        local sp = slider.AbsolutePosition
+                        local ss = slider.AbsoluteSize
+                        local isOver = ml.X >= sp.X and ml.X <= sp.X + ss.X
+                            and ml.Y >= sp.Y and ml.Y <= sp.Y + ss.Y
+                        if not isOver then return end
                         Held = true
+                        Window.Draggable = false
                         spawn(function()
-                            if Entered and not slider_options.readonly then
-                                while Held and (not dropdown_open) do
-                                    local mouse_location = gMouse()
-                                    local x = (slider.AbsoluteSize.X - (mouse_location.X - slider.AbsolutePosition.X) + 1) / slider.AbsoluteSize.X
-                                    local size = math.clamp(x, 0, 1)
-                                    Resize(indicator, {Size = UDim2.new(size, 0, 0, 20)}, options.tween_time)
-                                    local p = math.floor(size * 100)
-                                    local sel_value = math.floor(((slider_options.max - slider_options.min) / 100) * p + slider_options.min)
-                                    value.Text = tostring(sel_value)
-                                    pcall(callback, sel_value)
-                                    RS.Heartbeat:Wait()
-                                end
+                            while Held do
+                                local m = gMouse()
+                                local sp2 = slider.AbsolutePosition
+                                local ss2 = slider.AbsoluteSize
+                                local x = (m.X - sp2.X) / ss2.X
+                                local size = math.clamp(x, 0, 1)
+                                Resize(indicator, {Size = UDim2.new(size, 0, 0, 20)}, options.tween_time)
+                                local sel_value = math.floor((slider_options.max - slider_options.min) * size + slider_options.min)
+                                value.Text = tostring(sel_value)
+                                pcall(callback, sel_value)
+                                RS.Heartbeat:Wait()
                             end
+                            Window.Draggable = true
                         end)
                     end
                 end)
@@ -1187,7 +1186,7 @@ end
                     new_value = tonumber(new_value) or 0
                     new_value = math.clamp(new_value, slider_options.min, slider_options.max)
                     local p = (new_value - slider_options.min) / (slider_options.max - slider_options.min)
-                    Resize(indicator, {Size = UDim2.new(p, 0, 0, 20)}, options.tween_time)
+                    indicator.Size = UDim2.new(p, 0, 0, 20)
                     value.Text = tostring(new_value)
                     pcall(callback, new_value)
                 end
