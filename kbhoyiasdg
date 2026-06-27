@@ -32,7 +32,7 @@ local Tab = Instance.new("Frame")
 local UIListLayout_2 = Instance.new("UIListLayout")
 local TextBox = Instance.new("TextBox")
 local TextBox_Roundify_4px = Instance.new("ImageLabel")
-local Slider = Instance.new("ImageButton")
+local Slider = Instance.new("ImageLabel")
 local Title_2 = Instance.new("TextLabel")
 local Indicator = Instance.new("ImageLabel")
 local Value = Instance.new("TextLabel")
@@ -245,7 +245,6 @@ Slider.Image = "rbxassetid://2851929490"
 Slider.ImageColor3 = Color3.new(0.145098, 0.14902, 0.156863)
 Slider.ScaleType = Enum.ScaleType.Slice
 Slider.SliceCenter = Rect.new(4, 4, 4, 4)
-Slider.AutoButtonColor = false
 Title_2.Name = "Title"
 Title_2.Parent = Slider
 Title_2.BackgroundColor3 = Color3.new(1, 1, 1)
@@ -899,51 +898,31 @@ function library:AddWindow(title, options)
     end
     local Resizer = Window:WaitForChild("Resizer")
     local window_data = {}
-    Window.Draggable = false
-    local sliderActive = false  -- shared flag: true while any slider in this window is being dragged
+    Window.Draggable = true
     do
-        -- Custom window drag on the Bar
-        local Bar = Window:FindFirstChild("Bar")
-        local dragHeld = false
-        local dragStartMouse = Vector2.new()
-        local dragStartPos = UDim2.new()
-        Bar.InputBegan:Connect(function(inputObject)
-            if inputObject.UserInputType == Enum.UserInputType.MouseButton1 and not sliderActive then
-                dragHeld = true
-                dragStartMouse = gMouse()
-                dragStartPos = Window.Position
-                spawn(function()
-                    while dragHeld do
-                        if not sliderActive then
-                            local m = gMouse()
-                            local dx = m.X - dragStartMouse.X
-                            local dy = m.Y - dragStartMouse.Y
-                            Window.Position = UDim2.new(
-                                dragStartPos.X.Scale, dragStartPos.X.Offset + dx,
-                                dragStartPos.Y.Scale, dragStartPos.Y.Offset + dy
-                            )
-                        end
-                        RS.Heartbeat:Wait()
-                    end
-                end)
+        local oldIcon = mouse.Icon
+        local Entered = false
+        Resizer.MouseEnter:Connect(function()
+            Window.Draggable = false
+            if options.can_resize then
+                oldIcon = mouse.Icon
             end
+            Entered = true
         end)
-        UIS.InputEnded:Connect(function(inputObject)
-            if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
-                dragHeld = false
+        Resizer.MouseLeave:Connect(function()
+            Entered = false
+            if options.can_resize then
+                mouse.Icon = oldIcon
             end
+            Window.Draggable = true
         end)
-        -- Resizer
-        local resizerHeld = false
-        local resizerEntered = false
-        Resizer.MouseEnter:Connect(function() resizerEntered = true end)
-        Resizer.MouseLeave:Connect(function() resizerEntered = false end)
+        local Held = false
         UIS.InputBegan:Connect(function(inputObject)
             if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
-                if resizerEntered and Resizer.Active and options.can_resize then
-                    resizerHeld = true
-                    spawn(function()
-                        while resizerHeld and Resizer.Active do
+                Held = true
+                spawn(function()
+                    if Entered and Resizer.Active and options.can_resize then
+                        while Held and Resizer.Active do
                             local mouse_location = gMouse()
                             local x = mouse_location.X - Window.AbsolutePosition.X
                             local y = mouse_location.Y - Window.AbsolutePosition.Y
@@ -958,13 +937,13 @@ function library:AddWindow(title, options)
                             end
                             RS.Heartbeat:Wait()
                         end
-                    end)
-                end
+                    end
+                end)
             end
         end)
         UIS.InputEnded:Connect(function(inputObject)
             if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
-                resizerHeld = false
+                Held = false
             end
         end)
     end
@@ -1169,43 +1148,65 @@ end
                 indicator.ZIndex = indicator.ZIndex + (windows * 10)
                 value.ZIndex = value.ZIndex + (windows * 10)
                 title.Text = slider_text
-                local Held = false
-                slider.InputBegan:Connect(function(inputObject)
-                    if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
-                        if slider_options.readonly then return end
-                        Held = true
-                        sliderActive = true
-                        spawn(function()
-                            while Held do
-                                local m = gMouse()
-                                local sp = slider.AbsolutePosition
-                                local ss = slider.AbsoluteSize
-                                local x = (m.X - sp.X) / ss.X
-                                local size = math.clamp(x, 0, 1)
-                                indicator.Size = UDim2.new(size, 0, 0, 20)
-                                local sel_value = math.floor((slider_options.max - slider_options.min) * size + slider_options.min)
-                                value.Text = tostring(sel_value)
-                                pcall(callback, sel_value)
-                                RS.Heartbeat:Wait()
-                            end
-                            sliderActive = false
-                        end)
+                do
+                    local Entered = false
+                    slider.MouseEnter:Connect(function()
+                        Entered = true
+                        Window.Draggable = false
+                    end)
+                    slider.MouseLeave:Connect(function()
+                        Entered = false
+                        Window.Draggable = true
+                    end)
+                    local Held = false
+                    UIS.InputBegan:Connect(function(inputObject)
+                        if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
+                            Held = true
+                            spawn(function()
+                                if Entered and not slider_options.readonly then
+                                    while Held and (not dropdown_open) do
+                                        local mouse_location = gMouse()
+                                        local x = (slider.AbsoluteSize.X - (slider.AbsoluteSize.X - ((mouse_location.X - slider.AbsolutePosition.X)) + 1)) / slider.AbsoluteSize.X
+                                        local min = 0
+                                        local max = 1
+                                        local size = min
+                                        if x >= min and x <= max then
+                                            size = x
+                                        elseif x < min then
+                                            size = min
+                                        elseif x > max then
+                                            size = max
+                                        end
+                                        Resize(indicator, {Size = UDim2.new(size or min, 0, 0, 20)}, options.tween_time)
+                                        local p = math.floor((size or min) * 100)
+                                        local maxv = slider_options.max
+                                        local minv = slider_options.min
+                                        local diff = maxv - minv
+                                        local sel_value = math.floor(((diff / 100) * p) + minv)
+                                        value.Text = tostring(sel_value)
+                                        pcall(callback, sel_value)
+                                        RS.Heartbeat:Wait()
+                                    end
+                                end
+                            end)
+                        end
+                    end)
+                    UIS.InputEnded:Connect(function(inputObject)
+                        if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
+                            Held = false
+                        end
+                    end)
+                    function slider_data:Set(new_value)
+                        new_value = tonumber(new_value) or 0
+                        new_value = math.clamp(new_value, slider_options.min, slider_options.max)
+                        local p = (new_value - slider_options.min) / (slider_options.max - slider_options.min)
+                        Resize(indicator, {Size = UDim2.new(p, 0, 0, 20)}, options.tween_time)
+                        local sel_value = math.floor(((slider_options.max - slider_options.min) * p) + slider_options.min)
+                        value.Text = tostring(sel_value)
+                        pcall(callback, sel_value)
                     end
-                end)
-                UIS.InputEnded:Connect(function(inputObject)
-                    if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
-                        Held = false
-                    end
-                end)
-                function slider_data:Set(new_value)
-                    new_value = tonumber(new_value) or 0
-                    new_value = math.clamp(new_value, slider_options.min, slider_options.max)
-                    local p = (new_value - slider_options.min) / (slider_options.max - slider_options.min)
-                    indicator.Size = UDim2.new(p, 0, 0, 20)
-                    value.Text = tostring(new_value)
-                    pcall(callback, new_value)
+                    slider_data:Set(slider_options.min)
                 end
-                slider_data:Set(slider_options.min)
                 return slider_data, slider
             end
             function tab_data:AddDropdown(dropdown_name, callback)
