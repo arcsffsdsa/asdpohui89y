@@ -32,7 +32,7 @@ local Tab = Instance.new("Frame")
 local UIListLayout_2 = Instance.new("UIListLayout")
 local TextBox = Instance.new("TextBox")
 local TextBox_Roundify_4px = Instance.new("ImageLabel")
-local Slider = Instance.new("ImageLabel")
+local Slider = Instance.new("ImageButton")
 local Title_2 = Instance.new("TextLabel")
 local Indicator = Instance.new("ImageLabel")
 local Value = Instance.new("TextLabel")
@@ -245,6 +245,7 @@ Slider.Image = "rbxassetid://2851929490"
 Slider.ImageColor3 = Color3.new(0.145098, 0.14902, 0.156863)
 Slider.ScaleType = Enum.ScaleType.Slice
 Slider.SliceCenter = Rect.new(4, 4, 4, 4)
+Slider.AutoButtonColor = false
 Title_2.Name = "Title"
 Title_2.Parent = Slider
 Title_2.BackgroundColor3 = Color3.new(1, 1, 1)
@@ -1149,25 +1150,19 @@ end
                 value.ZIndex = value.ZIndex + (windows * 10)
                 title.Text = slider_text
                 local Held = false
-                UIS.InputBegan:Connect(function(inputObject)
+                slider.InputBegan:Connect(function(inputObject)
                     if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
                         if slider_options.readonly then return end
-                        local ml = gMouse()
-                        local sp = slider.AbsolutePosition
-                        local ss = slider.AbsoluteSize
-                        local isOver = ml.X >= sp.X and ml.X <= sp.X + ss.X
-                            and ml.Y >= sp.Y and ml.Y <= sp.Y + ss.Y
-                        if not isOver then return end
                         Held = true
                         Window.Draggable = false
                         spawn(function()
                             while Held do
                                 local m = gMouse()
-                                local sp2 = slider.AbsolutePosition
-                                local ss2 = slider.AbsoluteSize
-                                local x = (m.X - sp2.X) / ss2.X
+                                local sp = slider.AbsolutePosition
+                                local ss = slider.AbsoluteSize
+                                local x = (m.X - sp.X) / ss.X
                                 local size = math.clamp(x, 0, 1)
-                                Resize(indicator, {Size = UDim2.new(size, 0, 0, 20)}, options.tween_time)
+                                indicator.Size = UDim2.new(size, 0, 0, 20)
                                 local sel_value = math.floor((slider_options.max - slider_options.min) * size + slider_options.min)
                                 value.Text = tostring(sel_value)
                                 pcall(callback, sel_value)
