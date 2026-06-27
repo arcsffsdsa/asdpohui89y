@@ -899,31 +899,51 @@ function library:AddWindow(title, options)
     end
     local Resizer = Window:WaitForChild("Resizer")
     local window_data = {}
-    Window.Draggable = true
+    Window.Draggable = false
+    local sliderActive = false  -- shared flag: true while any slider in this window is being dragged
     do
-        local oldIcon = mouse.Icon
-        local Entered = false
-        Resizer.MouseEnter:Connect(function()
-            Window.Draggable = false
-            if options.can_resize then
-                oldIcon = mouse.Icon
+        -- Custom window drag on the Bar
+        local Bar = Window:FindFirstChild("Bar")
+        local dragHeld = false
+        local dragStartMouse = Vector2.new()
+        local dragStartPos = UDim2.new()
+        Bar.InputBegan:Connect(function(inputObject)
+            if inputObject.UserInputType == Enum.UserInputType.MouseButton1 and not sliderActive then
+                dragHeld = true
+                dragStartMouse = gMouse()
+                dragStartPos = Window.Position
+                spawn(function()
+                    while dragHeld do
+                        if not sliderActive then
+                            local m = gMouse()
+                            local dx = m.X - dragStartMouse.X
+                            local dy = m.Y - dragStartMouse.Y
+                            Window.Position = UDim2.new(
+                                dragStartPos.X.Scale, dragStartPos.X.Offset + dx,
+                                dragStartPos.Y.Scale, dragStartPos.Y.Offset + dy
+                            )
+                        end
+                        RS.Heartbeat:Wait()
+                    end
+                end)
             end
-            Entered = true
         end)
-        Resizer.MouseLeave:Connect(function()
-            Entered = false
-            if options.can_resize then
-                mouse.Icon = oldIcon
+        UIS.InputEnded:Connect(function(inputObject)
+            if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
+                dragHeld = false
             end
-            Window.Draggable = true
         end)
-        local Held = false
+        -- Resizer
+        local resizerHeld = false
+        local resizerEntered = false
+        Resizer.MouseEnter:Connect(function() resizerEntered = true end)
+        Resizer.MouseLeave:Connect(function() resizerEntered = false end)
         UIS.InputBegan:Connect(function(inputObject)
             if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
-                Held = true
-                spawn(function()
-                    if Entered and Resizer.Active and options.can_resize then
-                        while Held and Resizer.Active do
+                if resizerEntered and Resizer.Active and options.can_resize then
+                    resizerHeld = true
+                    spawn(function()
+                        while resizerHeld and Resizer.Active do
                             local mouse_location = gMouse()
                             local x = mouse_location.X - Window.AbsolutePosition.X
                             local y = mouse_location.Y - Window.AbsolutePosition.Y
@@ -938,13 +958,13 @@ function library:AddWindow(title, options)
                             end
                             RS.Heartbeat:Wait()
                         end
-                    end
-                end)
+                    end)
+                end
             end
         end)
         UIS.InputEnded:Connect(function(inputObject)
             if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
-                Held = false
+                resizerHeld = false
             end
         end)
     end
@@ -1154,7 +1174,7 @@ end
                     if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
                         if slider_options.readonly then return end
                         Held = true
-                        Window.Draggable = false
+                        sliderActive = true
                         spawn(function()
                             while Held do
                                 local m = gMouse()
@@ -1168,7 +1188,7 @@ end
                                 pcall(callback, sel_value)
                                 RS.Heartbeat:Wait()
                             end
-                            Window.Draggable = true
+                            sliderActive = false
                         end)
                     end
                 end)
